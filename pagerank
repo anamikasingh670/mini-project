@@ -1,0 +1,53 @@
+if __name__ == "__main__":
+    graph = {}
+    rank_old, rank_new = {}, {}
+    in_deg, out_deg_count = {}, {}
+    with open(input("\nNetwork file : "), "r") as f:
+        for i in iter(f):
+            l = i.strip("\n").split("\t")
+            if l[0] not in graph.keys():
+                graph[l[0]] = [l[1]]
+                out_deg_count[l[0]] = int(1)
+            else:
+                graph[l[0]].append(l[1])
+                out_deg_count[l[0]] += 1
+            if l[1] not in graph.keys():
+                graph[l[1]] = []
+                out_deg_count[l[1]] = int(0)
+            if l[1] not in in_deg.keys():
+                in_deg[l[1]] = [l[0]]
+            else:
+                in_deg[l[1]].append(l[0])
+            if l[0] not in in_deg.keys():
+                in_deg[l[0]] = []
+    d = float(input("\nDumping factor : "))
+    n = len(graph.keys())
+    '''for i in graph.keys():
+    	print(i, " ==> ", graph[i], sep = "")'''
+    k = int(input("\nTotal number of iterations : "))
+    '''for i in graph.keys():
+    	print(i , " ==> ", in_deg[i], sep = "")'''
+    vertices = [ x for x in graph.keys() ]
+    for i in vertices:
+        rank_old[i] = (1 - d) / n
+        rank_new[i] = float(0)
+    print("\nRank Initial\n")
+    for i in rank_old.keys():
+        print(i, " ==> ", rank_old[i])
+    for i in range(1, k + 1):
+        for j in vertices:
+            rank_new[j] = float(0)
+            for x in in_deg[j]:
+                if out_deg_count[x] == 0:
+                    rank_new[j] += 0
+                else:
+                    rank_new[j] += (rank_old[x] / out_deg_count[x])
+            rank_new[j] *= d
+        for j in vertices:
+            rank_old[j] = ((1 - d) / n) + rank_new[j]
+        print("\nRank Loop\n")
+        for j in graph.keys():
+        	print(j, " ==> ", rank_old[j])
+    print("\nFinal Rank\n")
+    for i in rank_old.keys():
+    	print(i, " ==> ", rank_old[i])
